@@ -17,6 +17,8 @@
 package com.android.cellbroadcastreceiver;
 
 import android.app.backup.BackupManager;
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -34,6 +36,7 @@ import android.telephony.CarrierConfigManager;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.MenuItem;
 
 /**
  * Settings activity for the cell broadcast receiver.
@@ -103,6 +106,12 @@ public class CellBroadcastSettings extends PreferenceActivity {
         if (userManager.hasUserRestriction(UserManager.DISALLOW_CONFIG_CELL_BROADCASTS)) {
             setContentView(R.layout.cell_broadcast_disallowed_preference_screen);
             return;
+        }
+
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            // android.R.id.home will be triggered in onOptionsItemSelected()
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
         // Display the fragment as the main content.
@@ -346,5 +355,24 @@ public class CellBroadcastSettings extends PreferenceActivity {
         }
 
         return defaultValue;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int itemId = item.getItemId();
+        switch (itemId) {
+            case android.R.id.home:
+                goUpToTopLevelSetting(this);
+                return true;
+            default:
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Finish current Activity and go up to the top level Settings.
+     */
+    public static void goUpToTopLevelSetting(Activity activity) {
+        activity.finish();
     }
 }
